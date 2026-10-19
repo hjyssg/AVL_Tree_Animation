@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AVL 树动画演示 · AVL Tree Visualizer</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">AVL</div>
+      <div>
+        <h1>AVL 树动画演示</h1>
+        <p class="subtitle">插入、删除、查找的每一步：访问路径、平衡因子、旋转过程与伪代码同步高亮</p>
+      </div>
+    </div>
+
+    <dl class="stats" aria-live="polite">
+      <div>
+        <dt>节点数</dt>
+        <dd id="stat-size">0</dd>
+      </div>
+      <div>
+        <dt>树高</dt>
+        <dd id="stat-height">0</dd>
+      </div>
+      <div>
+        <dt>状态</dt>
+        <dd id="stat-balanced">—</dd>
+      </div>
+    </dl>
+  </header>
+
+  <main class="layout">
+    <aside class="panel">
+      <h2>操作</h2>
+
+      <form class="field" id="insert-form" autocomplete="off">
+        <label for="insert-input">插入</label>
+        <div class="field-row">
+          <input id="insert-input" type="text" inputmode="numeric" placeholder="整数，例如 42">
+          <button class="btn primary" type="submit">插入</button>
+        </div>
+      </form>
+
+      <form class="field" id="remove-form" autocomplete="off">
+        <label for="remove-input">删除</label>
+        <div class="field-row">
+          <input id="remove-input" type="text" inputmode="numeric" placeholder="树中已有的值">
+          <button class="btn" type="submit">删除</button>
+        </div>
+      </form>
+
+      <form class="field" id="search-form" autocomplete="off">
+        <label for="search-input">查找</label>
+        <div class="field-row">
+          <input id="search-input" type="text" inputmode="numeric" placeholder="要查找的值">
+          <button class="btn" type="submit">查找</button>
+        </div>
+      </form>
+
+      <h2>设置</h2>
+
+      <fieldset class="segmented" id="mode-group">
+        <legend class="sr-only">树的类型</legend>
+        <label>
+          <input type="radio" name="tree-mode" value="avl" checked>
+          <span>AVL 树</span>
+        </label>
+        <label>
+          <input type="radio" name="tree-mode" value="bst">
+          <span>普通 BST</span>
+        </label>
+      </fieldset>
+      <p class="hint" id="mode-hint">AVL 模式：每次增删后沿路径回溯并旋转，保证 |bf| ≤ 1。</p>
+
+      <label class="range" for="speed-input">
+        <span>动画速度 <output id="speed-label">700 ms / 步</output></span>
+        <input id="speed-input" type="range" min="1" max="10" step="1" value="5">
+      </label>
+
+      <label class="switch" for="bf-toggle">
+        <input id="bf-toggle" type="checkbox" checked>
+        <span>显示平衡因子（节点右上角）</span>
+      </label>
+
+      <div class="actions">
+        <button class="btn" id="btn-random" type="button">随机生成</button>
+        <button class="btn" id="btn-reset" type="button">示例树</button>
+        <button class="btn ghost" id="btn-clear" type="button">清空</button>
+      </div>
+
+      <h2>图例</h2>
+      <ul class="legend">
+        <li><span class="dot dot-focus"></span>当前访问</li>
+        <li><span class="dot dot-path"></span>查找路径</li>
+        <li><span class="dot dot-matched"></span>命中 / 找到</li>
+        <li><span class="dot dot-inserted"></span>新插入</li>
+        <li><span class="dot dot-removed"></span>待删除</li>
+        <li><span class="dot dot-rotating"></span>旋转点</li>
+      </ul>
+
+      <p class="shortcuts">快捷键：<kbd>空格</kbd> 播放/暂停 · <kbd>←</kbd> <kbd>→</kbd> 单步</p>
+    </aside>
+
+    <section class="workspace">
+      <div class="stage-card">
+        <div class="stage-toolbar">
+          <span class="op-badge" id="op-badge">就绪</span>
+          <div class="playback">
+            <button class="btn icon" id="btn-play" type="button">暂停</button>
+            <button class="btn icon" id="btn-prev" type="button">上一步</button>
+            <button class="btn icon" id="btn-next" type="button">下一步</button>
+            <button class="btn icon ghost" id="btn-finish" type="button">跳到结束</button>
+          </div>
+        </div>
+
+        <div class="stage" id="stage">
+          <svg id="tree-svg" role="img" aria-label="二叉搜索树可视化"></svg>
+        </div>
+
+        <div class="status" aria-live="polite">
+          <p class="status-message" id="status-message">输入一个整数开始：插入会演示整条回溯与旋转路径。</p>
+          <div class="progress">
+            <div class="progress-track"><span id="progress-fill"></span></div>
+            <span class="progress-text" id="progress-text">0 / 0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <section class="card code-card">
+          <h2 id="code-title">伪代码</h2>
+          <ol class="code-list" id="code-list"></ol>
+        </section>
+
+        <section class="card log-card">
+          <h2>操作历史</h2>
+          <ul class="log-list" id="log-list">
+            <li class="log-empty">还没有操作</li>
+          </ul>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    原生 SVG + requestAnimationFrame 渲染，无第三方依赖 · 算法与动画分离，可暂停、单步与回看
+  </footer>
+
+  <noscript>这个演示需要启用 JavaScript。</noscript>
+
+  <script src="js/avl.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

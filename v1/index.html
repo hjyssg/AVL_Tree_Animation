@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Tree Algorithm Animation</title>
+
+    <link rel="stylesheet" href="bootstrap.min.css" />
+    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+
+  </head>
+
+  <body>
+
+
+
+    <div class="container">
+      <h4>Tree Algorithm Animation </h4>
+
+
+      <!-- <form id="type-form" class="row"> -->
+      <div class="row">
+        <div class="form-check form-check-inline" style="margin-left: 20px">
+          <input class="form-check-input"  type="radio" id="avl-tree" name="tree-type" value="avl-tree" checked />
+          <label class="form-check-label" for="avl-tree">avl tree</label>
+        </div>
+
+        <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" id="normal-tree"   name="tree-type" value="normal-tree" />
+        <label class="form-check-label" for="normal-tree">regular binary tree</label>
+      </div>
+        </div>
+      <!-- </form> -->
+
+      <div class="row">
+
+        <div class="control-bar col-4">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="insert_input" placeholder="insert value...">
+            <button class="btn btn-outline-secondary" type="button" id="insert_button"> insert </button>
+          </div>
+        </div>
+
+        <div class="control-bar col-4">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="search_input" placeholder="search value...">
+            <button class="btn btn-outline-secondary" type="button" id="search_button"> search </button>
+          </div>
+          <div id="search_message">  </div>
+        </div>
+
+
+        <div class="control-bar col-4">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="remove_input" placeholder="remove value...">
+            <button class="btn btn-outline-secondary" type="button" id="remove_button"> remove </button>
+          </div>
+          <div id="remove_message">  </div>
+        </div>
+
+<!--         <div class="control-bar col-4">
+          <button id="back-button" class="fas fa-history padding-5"> revert  </button>
+          <button id="forward-button" class="fas fa-redo padding-5"> redo  </button>
+        </div> -->
+
+
+      </div>
+
+
+
+
+      <div id="svg-container" > </div>
+
+      <div id="insert-panel" class="panel" style="display:none">
+        <p class="line-code" >insert v</p>
+        <p class="line-code" >check balance factor of node and its children</p>
+        <p class="line-code" >&nbsp;&nbsp;case1: node.rotateRight</p>
+        <p class="line-code" >&nbsp;&nbsp;case2: node.left.rotateLeft, node.rotateRight</p>
+        <p class="line-code" >&nbsp;&nbsp;case3: node.rotateLeft</p>
+        <p class="line-code" >&nbsp;&nbsp;case4: node.right.rotateRight, node.rotateLeft</p>
+        <p class="line-code" >&nbsp;&nbsp;node is balanced</p>
+      </div>
+
+      <div id="search-panel" class="panel" style="display:none">
+        <p class="line-code" >if node == null</p>
+        <p class="line-code" >&nbsp;&nbsp;return null</p>
+        <p class="line-code" >else if node key == search value</p>
+        <p class="line-code" >&nbsp;&nbsp;return node</p>
+        <p class="line-code" >else if node key &lt; search value</p>
+        <p class="line-code" >&nbsp;&nbsp;search right</p>
+        <p class="line-code" >else search left</p>
+      </div>
+
+
+
+      <div id="remove-panel" class="panel" style="width: 420px;display:none">
+        <p class="line-code" >remove v</p>
+        <p class="line-code" >check balance factor of node and its children</p>
+        <p class="line-code" >&nbsp;&nbsp;case1: node.rotateRight</p>
+        <p class="line-code" >&nbsp;&nbsp;case2: node.left.rotateLeft, node.rotateRight</p>
+        <p class="line-code" >&nbsp;&nbsp;case3: node.rotateLeft</p>
+        <p class="line-code" >&nbsp;&nbsp;case4: node.right.rotateRight, node.rotateLeft</p>
+        <p class="line-code" >&nbsp;&nbsp;node is balanced</p>
+      </div>
+
+      <!-- <footer>  </footer> -->
+
+      <!-- <footer> revert and redo is to insert/remove previous value, the tree may not be identical as previous. It is algorithm. </footer> -->
+    </div>
+
+
+    <div class="container">
+      <div class="control-bar col-8" >
+              <span >animation speed (fast -> slow) </span>
+              <input min="0"  max="20" type="range"  id='animation-speed-input' style="margin-left: 10px"/>
+      </div>
+    </div>
+  </body>
+
+  <script src="jquery-3.6.0.min.js"></script>
+  <script src="d3.min.js"></script>
+  <script src="avl.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+
+</html>

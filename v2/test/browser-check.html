@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>AVL browser check</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div id="stage" style="width: 900px">
+    <svg id="tree-svg"></svg>
+  </div>
+  <ol id="results"></ol>
+
+  <script src="../js/avl.js"></script>
+  <script src="../js/renderer.js"></script>
+  <script src="../js/player.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var results = document.getElementById('results');
+
+      function report(name, ok, extra) {
+        var item = document.createElement('li');
+        item.textContent = (ok ? 'PASS' : 'FAIL') + ' · ' + name + (extra ? ' · ' + extra : '');
+        results.appendChild(item);
+      }
+
+      try {
+        var svg = document.getElementById('tree-svg');
+        var renderer = new TreeRenderer(svg);
+        var tree = new AVL.AVLTree({ values: [50, 30, 70, 20, 40, 60, 80] });
+
+        renderer.render(tree.snapshot(), null, 0);
+        report('nodes rendered', svg.querySelectorAll('.node').length === 7,
+          'got ' + svg.querySelectorAll('.node').length);
+        report('links rendered', svg.querySelectorAll('path.link').length === 6,
+          'got ' + svg.querySelectorAll('path.link').length);
+        report('links have path data', Array.prototype.every.call(
+          svg.querySelectorAll('path.link'),
+          function (path) { return (path.getAttribute('d') || '').length > 12; }
+        ));
+        report('bf badges visible', svg.querySelectorAll('.bf-badge').length === 7);
+
+        var insert = tree.insert(10);
+        insert.steps.forEach(function (step) { renderer.render(step.tree, step, 0); });
+        report('insert snapshot rendered', svg.querySelectorAll('.node').length === 8);
+        report('inserted highlight', svg.querySelectorAll('.node.is-inserted').length === 1);
+
+        var zigzag = new AVL.AVLTree({ values: [30, 10] });
+        var rotated = zigzag.insert(20);
+        rotated.steps.forEach(function (step) { renderer.render(step.tree, step, 0); });
+        report('LR rotation rebalances', zigzag.root.key === 20 && zigzag.isBalanced());
+        report('rotation trace exists',
+          rotated.steps.some(function (step) { return step.kind === 'rotate'; }));
+
+        var removed = tree.remove(20);
+        removed.steps.forEach(function (step) { renderer.render(step.tree, step, 0); });
+        report('remove snapshot rendered', svg.querySelectorAll('.node').length === tree.size,
+          'dom ' + svg.querySelectorAll('.node').length + ' / tree ' + tree.size);
+
+        var played = 0;
+        var finished = 0;
+        var player = new StepPlayer({
+          onStep: function () { played += 1; },
+          onDone: function () { finished += 1; }
+        });
+        player.load(insert.steps);
+        player.finish();
+        report('player jumps to the last frame', played === 1 && player.index === insert.steps.length - 1,
+          'played ' + played + ', index ' + player.index);
+        report('player finishes once', finished === 1 && player.done === true);
+
+        player.prev();
+        report('player can step back', player.index === insert.steps.length - 2,
+          'index ' + player.index);
+
+        var stepped = 0;
+        var stepper = new StepPlayer({ onStep: function () { stepped += 1; } });
+        stepper.load(insert.steps);
+        while (stepper.index < insert.steps.length - 1) stepper.next();
+        report('manual stepping emits every step', stepped === insert.steps.length,
+          stepped + ' / ' + insert.steps.length);
+
+        renderer.setShowBF(false);
+        report('bf toggle class', svg.classList.contains('hide-bf'));
+        renderer.setShowBF(true);
+      } catch (err) {
+        report('unexpected exception', false, err && err.message);
+      }
+    })();
+  </script>
+</body>
+</html>

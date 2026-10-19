@@ -1,0 +1,61 @@
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.node text { font: 12px sans-serif; }
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}
+
+.control-bar {
+  margin-top: 15px;
+  /*margin-bottom: 10px;*/
+}
+
+footer {
+  font-size: 10px;
+}
+
+.padding-5 {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-weight: normal;
+   font-size: 10px;
+}
+
+
+#svg-container{
+  margin-top: 50px;
+}
+
+
+.panel {
+    font-size: 13px;
+    position: fixed;
+    color: #fff;
+    overflow: hidden;
+    background: #777;
+    white-space: nowrap;
+    padding: 20px 20px;
+
+    bottom: 60px;
+    right: 10px;
+    font-family: courier new,Courier,monospace;
+    background-color: rgb(82, 188, 105);
+    width: 420px;
+}
+
+.line-code {
+  background-color: rgb(82, 188, 105); 
+  color: rgb(255, 255, 255);
+}
+
+.code-highlight {
+  color: #777;
+  background-color: #fff;
+}
